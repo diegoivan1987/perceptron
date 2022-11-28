@@ -143,7 +143,12 @@ while salir != "1":
                 print("Error al insertar nuevo pokemon")
     #preguntamos una nueva caracteristica
     if preguntasExtra <= 5:
-        pass
+        bandera = input("¿desea aniadir una nueva caracteristica para futuras partidas? \n 1.-No 2.-Si\n")
+        if bandera == "2":
+            caracteristica = input("ingrese la nueva caracteristica(ejemplo 'lanza fuego': ")
+            cursor.execute("insert into caracteristica(caracteristica)values('"+caracteristica+"')")
+            conexion.commit()
+
 
 
     salir = input("Desea continuar? \n 1.-No 2.-Si ")
