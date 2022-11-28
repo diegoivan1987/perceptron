@@ -126,6 +126,21 @@ while salir != "1":
         if id != "0":
             pokemon["id"] = int(id)
             actualizarPokemon(cursor,conexion,sumatoria,pokemon,respuestas)
+        else: 
+            try:
+                cursor.execute("insert into pokemon(pokemon)values('"+nuevoNombre+"')")
+                conexion.commit()
+                cursor.execute("select id from pokemon order by id desc limit 1")
+                id = cursor.fetchone()[0]
+                cursor.execute("insert into aprendizaje(color,tamanio,tipo,pokemon)values({},{},{},{})".format(respuestas[0],respuestas[1],respuestas[2],id))
+                conexion.commit()
+                cursor.execute("select id from aprendizaje order by id desc limit 1")
+                id = cursor.fetchone()[0]
+                pokemon["id"] = int(id)
+                pokemon["valor"] = sumatoria
+                actualizarPokemon(cursor,conexion,sumatoria,pokemon,respuestas)
+            except:
+                print("Error al insertar nuevo pokemon")
     #preguntamos una nueva caracteristica
     if preguntasExtra <= 5:
         pass
