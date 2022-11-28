@@ -1,5 +1,53 @@
 import Conexion
 
+def actualizarPokemon(cursor,conexion,sumatoria,pokemon,respuestas):
+    nuevoValor = (sumatoria+pokemon["valor"])/2
+    try:
+        cursor.execute("update aprendizaje set color = {} where id = {}".format(respuestas[0],pokemon["id"]))
+        conexion.commit()
+    except:
+        print("Error al actualizar el color")
+    try:
+        cursor.execute("update aprendizaje set tamanio = {} where id = {}".format(respuestas[1],pokemon["id"]))
+        conexion.commit()
+    except:
+        print("Error al actualizar el tamanio")
+    try:
+        cursor.execute("update aprendizaje set tipo = {} where id = {}".format(respuestas[2],pokemon["id"]))
+        conexion.commit()
+    except:
+        print("Error al actualizar el tipo")
+    try:
+        cursor.execute("update aprendizaje set caracteristica1 = {} where id = {}".format(respuestas[3],pokemon["id"]))
+        conexion.commit()
+    except:
+        pass
+    try:
+        cursor.execute("update aprendizaje set caracteristica2 = {} where id = {}".format(respuestas[4],pokemon["id"]))
+        conexion.commit()
+    except:
+        pass
+    try:
+        cursor.execute("update aprendizaje set caracteristica3 = {} where id = {}".format(respuestas[5],pokemon["id"]))
+        conexion.commit()
+    except:
+        pass
+    try:
+        cursor.execute("update aprendizaje set caracteristica4 = {} where id = {}".format(respuestas[6],pokemon["id"]))
+        conexion.commit()
+    except:
+        pass
+    try:
+        cursor.execute("update aprendizaje set caracteristica5 = {} where id  ={}".format(respuestas[7],pokemon["id"]))
+        conexion.commit()
+    except:
+        pass
+    try:
+        cursor.execute("update aprendizaje set total = {} where id = {}".format(nuevoValor,pokemon["id"]))
+        conexion.commit()
+    except:
+        print("Error al actualizar el total")
+
 conexion = Conexion.conectar()
 cursor = conexion.cursor()
 
@@ -10,7 +58,7 @@ for i in resultado:
     print(i[1])"""
 
 salir = "0"
-pesoPreguntas = [1,2,1,3,3,3,3,3]
+pesoPreguntas = [1,2,3,4,5,6,7,8]
 
 while salir != "1":
     respuestas = []
@@ -47,20 +95,40 @@ while salir != "1":
         if bandera == "2":
             respuestas.append(preguntasExtra[0])
         else:
-            respuestas.append(preguntasExtra[0])
+            respuestas.append(0)
     
     #hacemos la sumatoria de las entradas por los pesos
     sumatoria = 0
     for i in range(len(respuestas)):
-        print(respuestas[i] + "*" + str(pesoPreguntas[i]))
         sumatoria += int(respuestas[i])*pesoPreguntas[i]
-    print("peso {}".format(sumatoria))
 
     #obtenemos el pokemon con el valor absoluto mas pequeño de la resta del valor en la base de datos con la salida actual
+    cursor.execute("select aprendizaje.id,pokemon.pokemon,aprendizaje.total from aprendizaje inner join pokemon on pokemon.id = aprendizaje.pokemon")
+    valores = cursor.fetchall()
+    pokemon = {"id":"","nombre":"","valor":0}
+    menor = 1000
+    for i in range(len(valores)):
+        if menor > abs(sumatoria-int(valores[i][2])):
+            menor = abs(sumatoria-int(valores[i][2]))
+            pokemon["id"]  = int(valores[i][0])
+            pokemon["nombre"]  = valores[i][1]
+            pokemon["valor"] = int(valores[i][2])
     #preguntamos si es correcto
-    #actualizamos el valor en la base de datos
-    #creamos nuevo registro
+    banderaCorrecto = input("¿Pensaste en el pokemon "+pokemon["nombre"]+"?\n1.-No 2.-Si\n")
+    if banderaCorrecto == 2:
+        #actualizamos los datos del pokemon
+        actualizarPokemon(cursor,conexion,sumatoria,pokemon,respuestas)
+    #creamos nuevo registro en caso de que sea uno nuevo
+    else:
+        nuevoNombre = input("Ingresa el nombre de tu pokemon")
+        cursor.execute("select aprendizaje.id from pokemon inner join aprendizaje on aprendizaje.pokemon = pokemon.id where pokemon.pokemon = '"+nuevoNombre+"'")
+        id = cursor.fetchone()
+        if id != "0":
+            pokemon["id"] = int(id)
+            actualizarPokemon(cursor,conexion,sumatoria,pokemon,respuestas)
     #preguntamos una nueva caracteristica
+    if preguntasExtra <= 5:
+        pass
 
 
     salir = input("Desea continuar? \n 1.-No 2.-Si ")
