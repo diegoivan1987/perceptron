@@ -1,6 +1,7 @@
 import Conexion
 
 def actualizarPokemon(cursor,conexion,sumatoria,pokemon,respuestas):
+    
     nuevoValor = (sumatoria+pokemon["valor"])/2
     try:
         cursor.execute("update aprendizaje set color = {} where id = {}".format(respuestas[0],pokemon["id"]))
@@ -71,7 +72,7 @@ while salir != "1":
     idColor = input()
     respuestas.append(idColor)
     #preguntamos el tamanio
-    print("¿Cual es el tamanio de tu pokemon")
+    print("¿Cual es el tamanio de tu pokemon?")
     cursor.execute("Select * from tamanio")
     resultado = cursor.fetchall()
     for tamanio in resultado:
@@ -79,7 +80,7 @@ while salir != "1":
     idTamanio = input()
     respuestas.append(idTamanio)
     #preguntamos el tipo
-    print("¿Cual es el tipo de tu pokemon")
+    print("¿Cual es el tipo de tu pokemon?")
     cursor.execute("Select * from tipo")
     resultado = cursor.fetchall()
     for tipo in resultado:
@@ -89,11 +90,11 @@ while salir != "1":
     #preguntamos alguna otra caracteristica si es que la hay
     cursor.execute("Select * from caracteristica")
     preguntasExtra = cursor.fetchall()
-    for pregunta in range(len(preguntasExtra)):
-        print("¿Tu pokemon "+preguntasExtra[1]+"?")
+    for i in range(len(preguntasExtra)):
+        print("¿Tu pokemon "+preguntasExtra[i][1]+"?")
         bandera = input("1.-No 2.-Si ")
         if bandera == "2":
-            respuestas.append(preguntasExtra[0])
+            respuestas.append(int(preguntasExtra[i][0]))
         else:
             respuestas.append(0)
     
@@ -115,18 +116,18 @@ while salir != "1":
             pokemon["valor"] = int(valores[i][2])
     #preguntamos si es correcto
     banderaCorrecto = input("¿Pensaste en el pokemon "+pokemon["nombre"]+"?\n1.-No 2.-Si\n")
-    if banderaCorrecto == 2:
+    if banderaCorrecto == "2":
         #actualizamos los datos del pokemon
         actualizarPokemon(cursor,conexion,sumatoria,pokemon,respuestas)
     #creamos nuevo registro en caso de que sea uno nuevo
     else:
-        nuevoNombre = input("Ingresa el nombre de tu pokemon")
-        cursor.execute("select aprendizaje.id from pokemon inner join aprendizaje on aprendizaje.pokemon = pokemon.id where pokemon.pokemon = '"+nuevoNombre+"'")
-        id = cursor.fetchone()
-        if id != "0":
+        nuevoNombre = input("Ingresa el nombre de tu pokemon: ")
+        try:
+            cursor.execute("select aprendizaje.id from pokemon inner join aprendizaje on aprendizaje.pokemon = pokemon.id where pokemon.pokemon = '"+nuevoNombre+"'")
+            id = cursor.fetchone()
             pokemon["id"] = int(id)
             actualizarPokemon(cursor,conexion,sumatoria,pokemon,respuestas)
-        else: 
+        except:
             try:
                 cursor.execute("insert into pokemon(pokemon)values('"+nuevoNombre+"')")
                 conexion.commit()
@@ -141,8 +142,9 @@ while salir != "1":
                 actualizarPokemon(cursor,conexion,sumatoria,pokemon,respuestas)
             except:
                 print("Error al insertar nuevo pokemon")
+      
     #preguntamos una nueva caracteristica
-    if preguntasExtra <= 5:
+    if len(preguntasExtra) <= 5:
         bandera = input("¿desea aniadir una nueva caracteristica para futuras partidas? \n 1.-No 2.-Si\n")
         if bandera == "2":
             caracteristica = input("ingrese la nueva caracteristica(ejemplo 'lanza fuego': ")
