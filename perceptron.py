@@ -125,7 +125,7 @@ while salir != "1":
         try:
             cursor.execute("select aprendizaje.id from pokemon inner join aprendizaje on aprendizaje.pokemon = pokemon.id where pokemon.pokemon = '"+nuevoNombre+"'")
             id = cursor.fetchone()
-            pokemon["id"] = int(id)
+            pokemon["id"] = int(id[0])
             actualizarPokemon(cursor,conexion,sumatoria,pokemon,respuestas)
         except:
             try:
@@ -144,10 +144,10 @@ while salir != "1":
                 print("Error al insertar nuevo pokemon")
       
     #preguntamos una nueva caracteristica
-    if len(preguntasExtra) <= 5:
+    if len(preguntasExtra) < 5:
         bandera = input("¿desea aniadir una nueva caracteristica para futuras partidas? \n 1.-No 2.-Si\n")
         if bandera == "2":
-            caracteristica = input("ingrese la nueva caracteristica(ejemplo 'lanza fuego': ")
+            caracteristica = input("ingrese la nueva caracteristica(ejemplo 'lanza fuego'): ")
             cursor.execute("insert into caracteristica(caracteristica)values('"+caracteristica+"')")
             conexion.commit()
 

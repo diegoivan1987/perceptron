@@ -54,7 +54,7 @@ update aprendizaje set total = 24 where pokemon = 3;
 update aprendizaje set total = 17 where pokemon = 4;
 update aprendizaje set total = 12 where pokemon = 5;
 
-#select aprendizaje.*,pokemon.pokemon from aprendizaje inner join pokemon on pokemon.id = aprendizaje.pokemon;
+select aprendizaje.*,pokemon.pokemon from aprendizaje inner join pokemon on pokemon.id = aprendizaje.pokemon;
 
 
 
